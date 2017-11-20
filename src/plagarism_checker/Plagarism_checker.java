@@ -57,7 +57,12 @@ public class Plagarism_checker extends Application {
             
             else
             {
+                File_Name_Collector collector = new File_Name_Collector(folder_dir);
+                collector.process();
+                //System.out.println(collector.files.size());
                 
+                Pre_Processor processor = new Pre_Processor(collector.files);
+                processor.process();
             }
             
             set_path_string("");
@@ -88,7 +93,7 @@ public class Plagarism_checker extends Application {
     void set_path_string(String path)
     {
         folder_dir = path ;
-        System.out.println("our path -- "+path);
+//        System.out.println("our path -- "+path);
     }
 
     /**

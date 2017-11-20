@@ -19,13 +19,13 @@ public class File_Name_Collector {
 
     public File_Name_Collector() {
         directory = "" ;
-        files.clear();
+        files = new ArrayList<File>();
     }
     
     public File_Name_Collector(String str)
     {
         directory = str ;
-        files.clear();
+        files = new ArrayList<File>();
     }
     
     public void process()
