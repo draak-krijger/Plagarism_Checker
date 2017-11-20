@@ -15,11 +15,13 @@ import java.util.* ;
 public class Pre_Processor {
     ArrayList<File>files ;
     ArrayList<String> file_contents ;
+    ArrayList<String> file_name ;
     
     Pre_Processor(ArrayList<File>files)
     {
         this.files = files ;
         file_contents = new ArrayList<String>() ;
+        file_name = new ArrayList<String>() ;
     }
     
     public String readFile(String filename)
@@ -134,7 +136,10 @@ public class Pre_Processor {
         for(int i=0 ; i<files.size() ; i++)
         {
             if(files.get(i).isFile())
+            {
                 file_contents.add(be_ready_for_compare(readFile(files.get(i).getAbsolutePath())));
+                file_name.add(files.get(i).getName());
+            }
         }
         //System.out.println(is_valid(','));
     }
