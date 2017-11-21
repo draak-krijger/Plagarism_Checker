@@ -40,10 +40,13 @@ public class Plagarism_checker extends Application {
     private TableView<Table_Row>table = new TableView<Table_Row>() ;
     private final ObservableList<Table_Row>list = FXCollections.observableArrayList() ;
     ArrayList<String> file_name ;
+    Thread nth ;
+    AddProgressBar bar ;
     
     @Override
     public void start(Stage primaryStage) {
         TH = new Checking();
+        nth = new Thread(tsk);
         Button check = new Button();
         check.setText("Check");
         
@@ -73,7 +76,7 @@ public class Plagarism_checker extends Application {
             else
             {
                 if(TH.isAlive())
-                {
+                {//System.out.println("th alive");
                     try
                     {
                         TH.stop();
@@ -85,28 +88,49 @@ public class Plagarism_checker extends Application {
                     }
                 }
                 
-                AddProgressBar bar = new AddProgressBar();
-                bar.show();
-                
-                Thread nth = new Thread(tsk);
-                nth.start();
-                
-                bar.window.setOnCloseRequest(event -> {
-                    nth.stop();
-                });
-                
-                tsk.setOnSucceeded(event -> {
-                    bar.window.close();
-                    //System.out.println("done");
-                    
-                    try{
-                    WriteExcel();
+                if(nth.isAlive())
+                {//System.out.println("nth alive");
+                    try
+                    {
+                        nth.stop();
                     }
                     
                     catch(Exception ex)
                     {
                         
                     }
+                }
+                
+//                AddProgressBar bar = new AddProgressBar();
+//                bar.show();
+                //System.out.println("bar kkkk");
+                bar = new AddProgressBar();
+                bar.show();
+//                if(tsk.isRunning()) System.out.println("gapla ache");
+                TH = new Checking();
+                nth = new Thread(tsk);
+                nth.start();
+                //System.out.println("nth start");
+                bar.window.setOnCloseRequest(event -> {
+                    nth.stop();
+                    tsk.cancel();
+                });
+                
+                tsk.setOnSucceeded(event -> {
+                    bar.window.close();
+                    //System.out.println("done");
+                    DynamicTableViewColumnCount table = new DynamicTableViewColumnCount();
+                    table.show(file_name,matching,total);
+                    try
+                    {
+                        TH.stop();
+                    }
+                    
+                    catch(Exception ex)
+                    {
+                        
+                    }
+                    
                 });
                 
                 set_path_string("");
@@ -138,7 +162,7 @@ public class Plagarism_checker extends Application {
     void set_path_string(String path)
     {
         folder_dir = path ;
-//        System.out.println("our path -- "+path);
+        //System.out.println("our path -- "+path);
     }
     
     class Checking extends Thread
@@ -180,6 +204,8 @@ public class Plagarism_checker extends Application {
         @Override
         protected Void call() 
         {
+            System.out.println("Task start");
+     
             TH.start();
             
             try
@@ -196,57 +222,57 @@ public class Plagarism_checker extends Application {
         } 
     };
     
-    public void WriteExcel() throws Exception {
-        Writer writer = null;
-        try {
-            Path path = Paths.get(Plagarism_checker.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-            String spath = path.toString() , tstr = "" ;
-            
-            spath = spath.substring(0, spath.lastIndexOf('\\'));
-            spath += "\\result.csv" ;
-            //System.out.println(spath);
-            File file = new File(spath);
-            file.createNewFile();
-            writer = new BufferedWriter(new FileWriter(file));
-            String text = ""  , ttext ;
-            int temp ;
-            mxl++;
-            
-            text = String.format("%" + mxl + "s", "");
-            
-            for(int i=0 ; i<total ; i++)
-            {
-                temp = file_name.get(i).length() ; 
-                text += String.format("%"+ (mxl-temp) +"s",file_name.get(i));
-            }
-            //System.out.println("ok ");
-            text += "\n";
-            writer.write(text);
-
-            for(int i=0 ; i<total ; i++)
-            {
-                temp = file_name.get(i).length();
-                text = String.format("%"+ (mxl-temp) +"s",file_name.get(i));
-                
-                for(int j=0 ; j<total ; j++)
-                {
-                    ttext = String.format("%.2f", matching[i][j]); 
-                    temp = ttext.length();
-                    text += String.format("%"+ (mxl-temp) +"s",ttext);
-                }
-                
-                text += "\n" ;
-                writer.write(text);
-            }
-        } catch (Exception ex) {
-           throw ex ;
-        }
-        finally {
-           
-            writer.flush();
-            writer.close();
-        } 
-    }
+//    public void WriteExcel() throws Exception {
+//        Writer writer = null;
+//        try {
+//            Path path = Paths.get(Plagarism_checker.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+//            String spath = path.toString() , tstr = "" ;
+//            
+//            spath = spath.substring(0, spath.lastIndexOf('\\'));
+//            spath += "\\result.csv" ;
+//            //System.out.println(spath);
+//            File file = new File(spath);
+//            file.createNewFile();
+//            writer = new BufferedWriter(new FileWriter(file));
+//            String text = ""  , ttext ;
+//            int temp ;
+//            mxl++;
+//            
+//            text = String.format("%" + mxl + "s", "");
+//            
+//            for(int i=0 ; i<total ; i++)
+//            {
+//                temp = file_name.get(i).length() ; 
+//                text += String.format("%"+ (mxl-temp) +"s",file_name.get(i));
+//            }
+//            //System.out.println("ok ");
+//            text += "\n";
+//            writer.write(text);
+//
+//            for(int i=0 ; i<total ; i++)
+//            {
+//                temp = file_name.get(i).length();
+//                text = String.format("%"+ (mxl-temp) +"s",file_name.get(i));
+//                
+//                for(int j=0 ; j<total ; j++)
+//                {
+//                    ttext = String.format("%.2f", matching[i][j]); 
+//                    temp = ttext.length();
+//                    text += String.format("%"+ (mxl-temp) +"s",ttext);
+//                }
+//                
+//                text += "\n" ;
+//                writer.write(text);
+//            }
+//        } catch (Exception ex) {
+//           throw ex ;
+//        }
+//        finally {
+//           
+//            writer.flush();
+//            writer.close();
+//        } 
+//    }
     
     /**
      * @param args the command line arguments
